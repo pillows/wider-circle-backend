@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 	"wider-circle-backend/db"
 	"wider-circle-backend/handlers"
 
@@ -14,7 +15,7 @@ import (
 func getEnv(key, defaultValue string) string {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Printf("Warning: Error loading .env file: %v", err)
 	}
 	value := os.Getenv(key)
 	if value == "" {
@@ -49,11 +50,28 @@ func main() {
 	// base case employee URL
 	// see env file other test case urls
 	employeeURL := getEnv("EMPLOYEE_SEED_URL",
-		"https://gist.githubusercontent.com/chancock09/6d2a5a4436dcd488b8287f3e3e4fc73d/raw/fa47d64c6d5fc860fabd3033a1a4e3c59336324e/employees.json")
+		"https://gist.githubusercontent.com/chancock09/6d2a5a4436dcd488b8287f3e3e4fc73d/raw/fa47d64c6d5fc860fabd3033a1a4e4c59336324e/employees.json")
 
 	database, err := db.InitializeDatabase(dbDriver, dbDSN)
 	if err != nil {
-		log.Fatalf("Database initialization failed: %v", err)
+		log.Printf("Database initialization failed: %v", err)
+
+		// Create a client with timeout
+		client := &http.Client{
+			Timeout: 10 * time.Second,
+		}
+
+		// Send GET request to /employees endpoint
+		resp, err := client.Get("http://localhost:" + port + "/employees")
+		if err != nil {
+			log.Printf("Failed to send request to /employees: %v", err)
+		} else {
+			log.Printf("Request to /employees returned status: %s", resp.Status)
+			resp.Body.Close()
+		}
+
+		// Continue execution with nil database, handlers should check for nil
+		database = nil
 	}
 
 	employeeHandler := handlers.NewEmployeeHandler(database, employeeURL)
