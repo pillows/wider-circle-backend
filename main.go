@@ -62,9 +62,9 @@ func main() {
 		}
 
 		// Send GET request to /employees endpoint
-		resp, err := client.Get("http://localhost:" + port + "/employees")
+		resp, err := client.Get("http://localhost:" + port + "/employee")
 		if err != nil {
-			log.Printf("Failed to send request to /employees: %v", err)
+			log.Printf("Failed to send request to /employee: %v", err)
 		} else {
 			log.Printf("Request to /employees returned status: %s", resp.Status)
 			resp.Body.Close()
@@ -77,7 +77,7 @@ func main() {
 	employeeHandler := handlers.NewEmployeeHandler(database, employeeURL)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/employees", employeeHandler.GetEmployees).Methods("GET")
+	router.HandleFunc("/employee", employeeHandler.GetEmployees).Methods("GET")
 
 	router.Use(corsMiddleware)
 
