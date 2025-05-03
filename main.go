@@ -66,7 +66,7 @@ func main() {
 		if err != nil {
 			log.Printf("Failed to send request to /employee: %v", err)
 		} else {
-			log.Printf("Request to /employees returned status: %s", resp.Status)
+			log.Printf("Request to /employee returned status: %s", resp.Status)
 			resp.Body.Close()
 		}
 

@@ -42,26 +42,6 @@ func InitializeDatabase(driver, dsn string) (*gorm.DB, error) {
 	return db, nil
 }
 
-func FetchEmployees(db *gorm.DB) ([]models.Employee, error) {
-	var employees []models.Employee
-	err := db.Find(&employees).Error
-	if err != nil {
-		return nil, err
-	}
-	return employees, nil
-}
-
-func StoreEmployees(db *gorm.DB, employees []models.Employee) error {
-	return db.Transaction(func(tx *gorm.DB) error {
-		for _, emp := range employees {
-			if err := tx.Create(&emp).Error; err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-}
-
 func EmployeeExists(db *gorm.DB) (bool, error) {
 	var count int64
 	err := db.Model(&models.Employee{}).Count(&count).Error
